@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
  * Every read and write is constrained to the current WordPress user.
  */
 final class Stardom_Projects {
-    public static function register(): void {
+    public static function register_post_type_only(): void {
         register_post_type('stardom_project', array(
             'label' => 'Stardom Projects',
             'public' => false,
@@ -16,6 +16,8 @@ final class Stardom_Projects {
             'capability_type' => 'post',
             'map_meta_cap' => true,
         ));
+    }
+    public static function register_routes(): void {
         register_rest_route('stardom/v1', '/projects', array(
             array(
                 'methods' => 'GET',
