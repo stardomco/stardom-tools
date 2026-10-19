@@ -1,0 +1,20 @@
+name: Stardom Core CI
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'stardom-core/**'
+      - '.github/workflows/stardom-core-ci.yml'
+  pull_request:
+    paths:
+      - 'stardom-core/**'
+      - '.github/workflows/stardom-core-ci.yml'
+jobs:
+  php-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check PHP version
+        run: php -v
+      - name: Run syntax smoke tests
+        run: php stardom-core/tests/smoke-test.php
