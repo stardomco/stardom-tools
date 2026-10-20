@@ -9,7 +9,7 @@ final class Stardom_BOM {
         register_post_type('stardom_bom', array(
             'label' => 'Stardom BOM',
             'public' => false,
-            'show_ui' => true,
+            'show_ui' => false,
             'show_in_rest' => false,
             'supports' => array('title'),
         ));
