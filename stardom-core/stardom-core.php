@@ -15,6 +15,8 @@ require_once __DIR__ . '/includes/class-stardom-dashboard.php';
 require_once __DIR__ . '/includes/class-stardom-bom.php';
 require_once __DIR__ . '/includes/class-stardom-rfq.php';
 require_once __DIR__ . '/includes/class-stardom-supplier-rfq.php';
+require_once __DIR__ . '/includes/class-stardom-supplier-approval.php';
+add_action('rest_api_init', array('Stardom_Supplier_Approval', 'register_routes'));
 require_once __DIR__ . '/includes/class-stardom-quotes.php';
 require_once __DIR__ . '/includes/class-stardom-quote-review.php';
 require_once __DIR__ . '/includes/class-stardom-po.php';
