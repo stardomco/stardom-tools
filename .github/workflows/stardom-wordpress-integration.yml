@@ -1,0 +1,55 @@
+name: Stardom WordPress Integration
+on:
+  push:
+    branches: [develop]
+    paths:
+      - 'stardom-core/**'
+      - '.github/workflows/stardom-wordpress-integration.yml'
+  pull_request:
+    paths:
+      - 'stardom-core/**'
+      - '.github/workflows/stardom-wordpress-integration.yml'
+jobs:
+  wordpress-smoke:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: wordpress
+          MYSQL_USER: wordpress
+          MYSQL_PASSWORD: wordpress
+          MYSQL_ROOT_PASSWORD: rootpass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -prootpass"
+          --health-interval=10s --health-timeout=5s --health-retries=12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mysqli, mbstring
+          tools: wp-cli
+      - name: Install WordPress
+        run: |
+          mkdir -p /tmp/stardom-wp
+          wp core download --path=/tmp/stardom-wp --allow-root --quiet
+          wp config create --path=/tmp/stardom-wp --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --dbhost=127.0.0.1 --allow-root --quiet
+          wp core install --path=/tmp/stardom-wp --url=http://localhost --title="Stardom Test" --admin_user=admin --admin_password=integration-test-password --admin_email=integration@example.invalid --skip-email --allow-root --quiet
+          cp -R stardom-core /tmp/stardom-wp/wp-content/plugins/stardom-core
+          wp plugin activate stardom-core --path=/tmp/stardom-wp --allow-root
+      - name: Check roles, REST routes and anonymous access
+        run: |
+          wp eval '
+          if (!get_role("stardom_customer") || !get_role("stardom_supplier") || !get_role("stardom_builder")) { throw new Exception("Missing roles"); }
+          $routes = rest_get_server()->get_routes();
+          foreach (array("/stardom/v1/me", "/stardom/v1/projects", "/stardom/v1/supplier/rfqs") as $route) {
+            if (!isset($routes[$route])) { throw new Exception("Missing route: " . $route); }
+          }
+          wp_set_current_user(0);
+          $response = rest_do_request(new WP_REST_Request("GET", "/stardom/v1/me"));
+          if ($response->get_status() < 400) { throw new Exception("Anonymous route leak"); }
+          echo "Stardom WordPress integration smoke passed\n";
+          ' --path=/tmp/stardom-wp --allow-root
