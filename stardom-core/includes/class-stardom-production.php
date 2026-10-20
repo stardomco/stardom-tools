@@ -11,6 +11,8 @@ final class Stardom_Production {
         ));
     }
     public static function release(WP_REST_Request $r) {
+        // Production release remains disabled until engineering and compliance gates are verified.
+        return new WP_Error('release_disabled', 'Production release is unavailable pending engineering and compliance approval integration.', array('status' => 503));
         $id = absint($r['po_id']);
         $po = get_post($id);
         if (!$po || $po->post_type !== 'stardom_po' || $po->post_status !== 'private') {
