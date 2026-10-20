@@ -5,7 +5,7 @@ defined('ABSPATH') || exit;
 final class Stardom_RFQ {
     public static function register_type(): void {
         register_post_type('stardom_rfq', array(
-            'label' => 'Stardom RFQs', 'public' => false, 'show_ui' => true,
+            'label' => 'Stardom RFQs', 'public' => false, 'show_ui' => false,
             'show_in_rest' => false, 'supports' => array('title'),
         ));
     }
