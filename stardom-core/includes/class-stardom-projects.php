@@ -10,7 +10,7 @@ final class Stardom_Projects {
         register_post_type('stardom_project', array(
             'label' => 'Stardom Projects',
             'public' => false,
-            'show_ui' => true,
+            'show_ui' => false,
             'show_in_rest' => false,
             'supports' => array('title'),
             'capability_type' => 'post',
