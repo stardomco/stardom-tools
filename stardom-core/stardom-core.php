@@ -20,6 +20,8 @@ require_once __DIR__ . '/includes/class-stardom-quote-review.php';
 require_once __DIR__ . '/includes/class-stardom-po.php';
 require_once __DIR__ . '/includes/class-stardom-production.php';
 require_once __DIR__ . '/includes/class-stardom-po-approval.php';
+require_once __DIR__ . '/includes/class-stardom-qc.php';
+add_action('rest_api_init', array('Stardom_QC', 'register_routes'));
 add_action('rest_api_init', array('Stardom_PO_Approval', 'register_routes'));
 add_action('rest_api_init', array('Stardom_Production', 'register_routes'));
 add_action('init', array('Stardom_PO', 'register_type'));
