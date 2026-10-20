@@ -16,14 +16,14 @@ final class Stardom_Production {
         if (!$po || $po->post_type !== 'stardom_po' || $po->post_status !== 'private') {
             return new WP_Error('invalid_po', 'Purchase order not found.', array('status' => 404));
         }
-        if (get_post_meta($id, '_stardom_po_status', true) !== 'draft') {
-            return new WP_Error('invalid_state', 'PO is not a draft.', array('status' => 409));
+        if (get_post_meta($id, '_stardom_po_status', true) !== 'approved') {
+            return new WP_Error('invalid_state', 'PO requires independent approval before release.', array('status' => 409));
         }
         $ref = sanitize_text_field($r->get_param('reference'));
         if (mb_strlen($ref) < 3 || mb_strlen($ref) > 120) {
             return new WP_Error('invalid_reference', 'Release reference required.', array('status' => 400));
         }
-        if (!update_post_meta($id, '_stardom_po_status', 'released', 'draft')) {
+        if (!update_post_meta($id, '_stardom_po_status', 'released', 'approved')) {
             return new WP_Error('conflict', 'PO state changed.', array('status' => 409));
         }
         add_post_meta($id, '_stardom_po_release_event', array(
