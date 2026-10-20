@@ -14,6 +14,8 @@ require_once __DIR__ . '/includes/class-stardom-access.php';
 require_once __DIR__ . '/includes/class-stardom-dashboard.php';
 require_once __DIR__ . '/includes/class-stardom-bom.php';
 require_once __DIR__ . '/includes/class-stardom-rfq.php';
+require_once __DIR__ . '/includes/class-stardom-supplier-rfq.php';
+add_action('rest_api_init', array('Stardom_Supplier_RFQ', 'register_routes'));
 add_action('init', array('Stardom_RFQ', 'register_type'));
 add_action('rest_api_init', array('Stardom_RFQ', 'register_routes'));
 add_action('init', array('Stardom_BOM', 'register_types'));
