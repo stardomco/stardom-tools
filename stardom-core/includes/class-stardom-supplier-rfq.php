@@ -24,7 +24,8 @@ final class Stardom_Supplier_RFQ {
     public static function is_supplier(): bool {
         if (!is_user_logged_in()) return false;
         $user = wp_get_current_user();
-        return in_array('stardom_supplier', (array) $user->roles, true);
+        return in_array('stardom_supplier', (array) $user->roles, true)
+            && get_user_meta($user->ID, '_stardom_supplier_approved', true) === 'yes';
     }
     public static function assign(WP_REST_Request $r) {
         $rfq = get_post((int) $r['rfq_id']);
@@ -33,7 +34,8 @@ final class Stardom_Supplier_RFQ {
         if (!$rfq || $rfq->post_type !== 'stardom_rfq' || $rfq->post_status !== 'private') {
             return new WP_Error('invalid_rfq', 'RFQ not found.', array('status' => 404));
         }
-        if (!$user || !in_array('stardom_supplier', (array) $user->roles, true)) {
+        if (!$user || !in_array('stardom_supplier', (array) $user->roles, true)
+            || get_user_meta($uid, '_stardom_supplier_approved', true) !== 'yes') {
             return new WP_Error('invalid_supplier', 'Approved supplier account required.', array('status' => 400));
         }
         $ids = array_map('absint', (array) get_post_meta($rfq->ID, '_stardom_assigned_supplier_users', true));
