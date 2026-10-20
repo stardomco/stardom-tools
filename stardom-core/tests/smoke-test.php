@@ -1,24 +1,29 @@
 <?php
 /**
- * Stardom Core minimal smoke test.
+ * Stardom Core syntax smoke test.
  * Run: php stardom-core/tests/smoke-test.php
- * This test does not bootstrap WordPress or write data.
+ * Checks every PHP file, not only the original plugin entry points.
  */
-$files = array(
-    dirname(__DIR__) . '/stardom-core.php',
-    dirname(__DIR__) . '/includes/class-stardom-core.php',
+$root = dirname(__DIR__);
+$iterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
 );
-foreach ($files as $file) {
-    if (!is_file($file)) {
-        fwrite(STDERR, "Missing: {$file}\n");
-        exit(1);
+$checked = 0;
+foreach ($iterator as $file) {
+    if (!$file->isFile() || strtolower($file->getExtension()) !== 'php') {
+        continue;
     }
     $output = array();
     $status = 0;
-    exec(escapeshellarg(PHP_BINARY) . ' -l ' . escapeshellarg($file) . ' 2>&1', $output, $status);
+    exec(escapeshellarg(PHP_BINARY) . ' -l ' . escapeshellarg($file->getPathname()) . ' 2>&1', $output, $status);
     if ($status !== 0) {
         fwrite(STDERR, implode("\n", $output) . "\n");
         exit(1);
     }
+    ++$checked;
 }
-echo "Stardom Core syntax smoke test passed.\n";
+if ($checked < 2) {
+    fwrite(STDERR, "Expected PHP source files were not found.\n");
+    exit(1);
+}
+echo "Stardom Core syntax checks passed for {$checked} PHP files.\n";
