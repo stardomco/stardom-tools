@@ -23,13 +23,19 @@ final class Stardom_Supplier_Approval {
             return new WP_Error('invalid_decision', 'Valid decision and reason required.', array('status' => 400));
         }
         $new_status = $decision === 'approved' ? 'yes' : 'no';
-        update_user_meta($uid, '_stardom_supplier_approved', $new_status);
-        add_user_meta($uid, '_stardom_supplier_approval_event', array(
+        $updated = update_user_meta($uid, '_stardom_supplier_approved', $new_status);
+        if (!$updated && get_user_meta($uid, '_stardom_supplier_approved', true) !== $new_status) {
+            return new WP_Error('approval_update_failed', 'Supplier approval could not be saved.', array('status' => 500));
+        }
+        $logged = add_user_meta($uid, '_stardom_supplier_approval_event', array(
             'decision' => $decision,
             'reason' => $reason,
             'reviewed_by' => get_current_user_id(),
             'reviewed_at_gmt' => current_time('mysql', true),
         ), false);
+        if (!$logged) {
+            return new WP_Error('audit_failed', 'Approval updated but audit logging failed; administrator review required.', array('status' => 500));
+        }
         return rest_ensure_response(array('supplier_user_id' => $uid, 'approval' => $decision));
     }
 }
