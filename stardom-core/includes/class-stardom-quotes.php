@@ -5,7 +5,7 @@ final class Stardom_Quotes {
     public static function register_type(): void {
         register_post_type('stardom_quote', array(
             'label' => 'Stardom Supplier Quotes', 'public' => false,
-            'show_ui' => true, 'show_in_rest' => false, 'supports' => array('title'),
+            'show_ui' => false, 'show_in_rest' => false, 'supports' => array('title'),
         ));
     }
     public static function register_routes(): void {
